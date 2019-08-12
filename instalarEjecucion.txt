@@ -1,0 +1,7 @@
+instalar
+sudo apt-get install python-matplotlib python-numpy python2.7-dev
+
+
+ejecutar
+g++ proyecto.cpp -std=c++11 -I/usr/include/python2.7 -lpython2.7
+./a.out
