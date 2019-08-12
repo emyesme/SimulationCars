@@ -39,7 +39,7 @@ int main(){
 	double maxtime = 0;
 	double mintime = 9999;
 	int years = 100;
-	
+
 	//cout << "el costo inicial es "<< 5+4*m+0.2*m*m << endl;
 
 	vector<Car> myCars;
@@ -48,25 +48,16 @@ int main(){
 	
 	carsGenerator(4,sum,0,100,failCars,maxtime,mintime,myCars,yline);
 	/*Grafica de carros versus averia en años */
-	//carsTimeDamage(m, years, myCars, yline);
+	//carsTimeDamage(4, years, myCars, yline);
 
 	/*Grafica de tabla de frecuencias */
 	//carsHistogramDamage(maxtime, mintime, 1, myCars);
 	
 	/*total vs fail 1000-2000 m=4 */
-	//carsFailGood(4, 1000, 200, myCars, yline, compare);
-
-	/*total vs fail 1000-2000 6 */
-	//carsFailGood(6, 1000, 200, myCars, yline, compare);
-
-	/*Grafica cost m=4 y cost m = 6 0-1000 */
-	//carsCostInterval(4,6,0,100,myCars,yline,compare);
-
-	/*Grafica cost m=4 y cost m = 6 1000-2000 */
-	//carsCostInterval(4,6,1000,200,myCars,yline,compare);
+	//carsFailGood(4, 0, 100, myCars, yline, compare);
 
 	/*Grafica cost m=4 y cost m = 6 2000-3000 */
-	carsCostInterval(4,6,2000,300,myCars,yline,compare);
+	//carsCostInterval(4,6,0,100,myCars,yline,compare);
 
 	return 0;
 }
@@ -74,12 +65,12 @@ int main(){
 void carsGenerator(int m,double &sum,int start, int years,int &failCars, double &maxtime, double &mintime, vector<Car> &myCars, vector<double> &yline){
 	Car * currentCar = NULL;
 	double lambda = (double) 1/m;
+	int cars = 0;
+	int valid = 0;
 	//Generador de números aleatorios
 	default_random_engine generator;
 	//Distribución exponencial
 	exponential_distribution<double> distribution(lambda);
-	int cars = 0;
-	int valid = 0;
 	for(int i=1; i<=years; i++){
 		for (int j=1; j<=10; j++){
 			if(cars < start){
@@ -123,7 +114,11 @@ void carsTimeDamage(int m, int years, vector<Car> myCars, vector<double> &yline)
 	plt::ylabel("averia (anios)");
 	plt::xlabel("Autos generados");
 	plt::title("Generando fallas");
-	plt::show();
+	std::string out_1;
+	std::stringstream ss1;
+	ss1 << m;
+	out_1 = ss1.str();
+	plt::save("carros m="+out_1+".png");
 	plt::clf();
 }
 
@@ -143,7 +138,10 @@ void carsHistogramDamage(int maxtime, int mintime, int widthInterval, vector<Car
 	vector <int> histogram(freqIntervals,freqIntervals+numIntervals);
 	plt::xlim(0,numIntervals);
 	plt::bar(histogram);
-	plt::show();
+	plt::xlabel("Intervalos");
+	plt::ylabel("Frecuencia de Intervalos");
+	plt::title("Frecuencias");
+	plt::save("histograma.png");
 	plt::clf();
 }
 
@@ -183,8 +181,9 @@ void carsCostInterval(int m1, int m2, int start,int years,vector <Car> &myCars,v
 	plt::clf();
 	plt::bar(compare);
 	plt::xticks(ticks,labels);
-	plt::title("Costo");
-	plt::show();
+	plt::ylabel("dinero promedio");
+	plt::title("Costo promedio por carro");
+	plt::save("costo.png");
 	plt::clf();
 
 }
@@ -205,9 +204,18 @@ void carsFailGood(int m, int start,int years,vector <Car> &myCars,vector <double
 	versus[1] = failCars;
 	compare.insert(compare.begin(), begin(versus),end(versus));
 
+	vector <string> labels (2);
+	vector <int> ticks (2);
+
+	labels.insert(labels.begin(),"Dañados sin Garantia");
+	labels.insert(labels.begin(),"Dañados con Garantia");
+
+	ticks.insert(ticks.begin(),0);
+	ticks.insert(ticks.begin(),1);
+
 	plt::clf();
 	plt::bar(compare);
-	plt::title("sin Fallos vs con Fallos");
+	plt::title("Despues Garantia vs Antes Garantia");
 	std::string out_1, out_2, out_3;
 	std::stringstream ss1, ss2, ss3;
 	ss1 << years*10;
@@ -216,6 +224,8 @@ void carsFailGood(int m, int start,int years,vector <Car> &myCars,vector <double
 	out_1 = ss1.str();
 	out_2 = ss2.str();
 	out_3 = ss3.str();
+	plt::ylabel("cantidad de carros");
+	plt::xticks(ticks,labels);
 	plt::save(out_3+"-"+out_1+"m"+out_2+".png");
 	plt::clf();
 }
